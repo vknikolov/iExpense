@@ -5,18 +5,18 @@
 //  Created by Veselin Nikolov on 2.10.25.
 //
 
+import SwiftData
 import SwiftUI
 
 struct AddView: View {
+    @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
     @State private var name: String = ""
-    @State private var type: Category = .business
+    @State private var type: String = "Business"
     @State private var amount: Double = 0.0
     @State private var selectedCurrency = "USD"
-
-    var expenses: Expenses
-
-//    let types = ["Business", "Personal"]
+    
+    let categories = ["Business", "Personal"]
     let currency = ["USD", "EUR", "AUD", "CAD", "CHF", "GBP", "JPY", "BGN"]
 
     var body: some View {
@@ -25,8 +25,8 @@ struct AddView: View {
                 TextField("Name", text: $name)
 
                 Picker("Type", selection: $type) {
-                    ForEach(Category.allCases, id: \.self) { category in
-                        Text(category.rawValue)
+                    ForEach(categories, id: \.self) { category in
+                        Text(category)
                     }
                 }
 
@@ -47,16 +47,16 @@ struct AddView: View {
             .navigationTitle("Add new expense")
             .toolbar {
                 Button("Save") {
-                    let expense = ExpenseItem(
+                    let expense = Expense(
                         name: name,
-                        type: type,
+                        category: type,
                         amount: amount,
                         currency: selectedCurrency
                     )
-                    if type == .business {
-                        expenses.business.append(expense)
+                    if type == "Business" {
+                        modelContext.insert(expense)
                     } else {
-                        expenses.personal.append(expense)
+                        modelContext.insert(expense)
                     }
 
                     dismiss()
@@ -67,5 +67,5 @@ struct AddView: View {
 }
 
 #Preview {
-    AddView(expenses: Expenses())
+    AddView()
 }
